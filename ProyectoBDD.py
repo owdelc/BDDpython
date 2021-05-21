@@ -71,11 +71,12 @@ def SignUp():
 # Definicion de funcionalidades de Administrador 
 def AdminUser():
     a = 0
-    while a != 6:
+    while a != 9:
         print('Ingrese la operacion que desea realizar')
-        print('1. Agregar un usuario \n' + '2. Actualizar usuario \n' + '3. Eliminar Usuario \n' + '4. Ver vitacora de acciones \n' + '5. Realizar simulacion de reproducciones \n' + '6. Salir \n')
+        print('1. Agregar un usuario \n' + '2. Actualizar usuario \n' + '3. Eliminar Usuario \n' + '4. Agregar Cancion \n' + '5. Modificar Cancion \n' + '6. Eliminar Cancion \n' +'7. Ver bitacora de acciones \n' + '8. Realizar simulacion de reproducciones \n' + '9. Salir \n')
         a = int(input('La operacion que desea realizar: '))
         
+        #Agregar usuario
         if a == 1:
             usuario = input('Ingrese usuario que desea registrar: ')
             password1 = input('Ingrese contraseña: ')
@@ -92,9 +93,11 @@ def AdminUser():
                 print("Error en la transaccion, revirtiendo operaciones ", error)
                 conn.rollback()
             
-        
+        #Editar usuario
         if a == 2:
             print("opcion")
+        
+        #Eliminar usuario
         if a == 3:
             usuario1 = input('Ingrese el usuario que desea eliminar: ')
             usuario2 = input('Confirme usuario que desea eliminar: ')
@@ -107,10 +110,47 @@ def AdminUser():
                     print(usuario1, ' Eliminado correctamente')
                 except (Exception, psycopg2.DatabaseError) as error:
                     print('Error en la ejecucion' , error)
-                
+        
+        
+        #Agregar cancion       
         if a == 4:
-            print("opcion")
+            titulo = input('Ingrese titulo de la cancion: ')
+            album = input('Ingrese album al que pertene la cancion: ')
+            artista = input('Ingrese artista al que pertenece la cancion: ')
+            anio = int(input('Ingrese año de lanzamiento: '))
+            url = input('Ingrese url de reproduccion: ')
+            reproducciones = 0
+            try:
+                cur = conn.cursor()
+                cur.execute('INSERT INTO canciones(cancion, album, artista, anio, url, reproducciones) VALUES(%s,%s,%s,%s,%s,%s);',[titulo, album, artista, anio, url, reproducciones])
+                conn.commit()
+                cur.close()
+                print('Ingreso exitoso! Titulo: ' + titulo + ' Album: ' + album + ' Artista: ' + artista)
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error en la transaccion, revirtiendo operaciones ", error)
+                conn.rollback()
+            
+        #Editar cancion
         if a == 5:
+            print("opcion")
+            
+        #Eliminar cancion
+        if a == 6:
+            cancion = input('Ingrese cancion que desea eliminar: ')
+            album = input('Ingrese album al que pertenece la cancion: ')
+            try:
+                    cur = conn.cursor()
+                    cur.execute('DELETE FROM canciones WHERE cancion = %s AND album = %s;',[cancion, album])
+                    conn.commit()
+                    cur.close()
+                    print(cancion, ' eliminada correctamente')
+            except (Exception, psycopg2.DatabaseError) as error:
+                    print('Error en la ejecucion' , error)
+            
+        
+        if a == 7:
+            print("opcion")
+        if a == 8:
             print("opcion")
 
 #Log in y Register 
@@ -124,8 +164,7 @@ if opcion1 == 1:
     password = input("Ingrese contaseña: ")
     Login(username, password)
     
-if opcion1 == 2:
-    
+if opcion1 == 2:   
     SignUp()
     
     
