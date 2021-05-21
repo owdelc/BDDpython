@@ -24,7 +24,7 @@ def Login(username,password):
     cur = conn.cursor()
     cur.execute('select name from users where name = %s;', [username])
     userp = [i [0] for i in cur.fetchall()]
-    print(userp)
+    #print(userp)
     if userp == [username]:
         cur.execute('select password from users where password = %s;',[password])
         passp = [i [0] for i in cur.fetchall()]
@@ -33,7 +33,7 @@ def Login(username,password):
             cur.execute('select rol from users where name = %s;',[username])
             roles = [i [0] for i in cur.fetchall()]
             if roles == [1]:
-                print("*********************************")
+                print("*********************************\n" + "Bienvenido a Administracion")
                 AdminUser()
             if roles == [2]:
                 print("Free user")
@@ -82,12 +82,32 @@ def AdminUser():
             password2 = input('Confirme contraseña: ')
             print('Debe designar un tipo de usuario. Las opciones son las siguientes: \n' + '1. Administrador \n' + '2. Freemium \n' + '3. Premium \n' + '4. Artista/Manager')
             tipo = int(input('Tipo de usuario: '))
+            try:
+                cur = conn.cursor()
+                cur.execute('INSERT INTO users(name,password,rol) VALUES(%s,%s,%s);',(usuario, password1, tipo))
+                conn.commit()
+                cur.close()
+                print('Ingreso exitoso! Usuario: ' + usuario + ' Contraseña: ' + password1)
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error en la transaccion, revirtiendo operaciones ", error)
+                conn.rollback()
             
         
         if a == 2:
             print("opcion")
         if a == 3:
-            print("opcion")
+            usuario1 = input('Ingrese el usuario que desea eliminar: ')
+            usuario2 = input('Confirme usuario que desea eliminar: ')
+            if usuario1 == usuario2:
+                try:
+                    cur = conn.cursor()
+                    cur.execute('DELETE FROM users WHERE name = %s;',[usuario1])
+                    conn.commit()
+                    cur.close()
+                    print(usuario1, ' Eliminado correctamente')
+                except (Exception, psycopg2.DatabaseError) as error:
+                    print('Error en la ejecucion' , error)
+                
         if a == 4:
             print("opcion")
         if a == 5:
