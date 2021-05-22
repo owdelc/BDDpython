@@ -71,9 +71,9 @@ def SignUp():
 # Definicion de funcionalidades de Administrador 
 def AdminUser():
     a = 0
-    while a != 9:
-        print('Ingrese la operacion que desea realizar')
-        print('1. Agregar un usuario \n' + '2. Actualizar usuario \n' + '3. Eliminar Usuario \n' + '4. Agregar Cancion \n' + '5. Modificar Cancion \n' + '6. Eliminar Cancion \n' +'7. Ver bitacora de acciones \n' + '8. Realizar simulacion de reproducciones \n' + '9. Salir \n')
+    while a != 10:
+        print('\nIngrese la operacion que desea realizar')
+        print('1. Agregar un usuario \n' + '2. Actualizar usuario \n' + '3. Eliminar Usuario \n' + '4. Agregar Cancion \n' + '5. Modificar Cancion \n' + '6. Eliminar Cancion \n' +'7. Ver bitacora de acciones \n' + '8. Realizar simulacion de reproducciones \n' + '9. Perfilar usuario en MongoDB \n'+ '10. Salir')
         a = int(input('La operacion que desea realizar: '))
         
         #Agregar usuario
@@ -95,8 +95,36 @@ def AdminUser():
             
         #Editar usuario
         if a == 2:
-            print("opcion")
-        
+            print('Opciones de modificacion:\n' + '1. Cambiar contraseña \n' + '2. Modificar rol')
+            b = int(input('Ingrese la opcion deseada: '))
+            if b == 1:
+                usuario = input('Ingrese el usuario al que quiere mldificar la contraseña:')
+                password1a = input('Ingrese nueva contraseña: ')
+                password2a = input('Confirme nueva contraseña: ')
+                if password1a == password2a:
+                    try:
+                        cur = conn.cursor()
+                        cur.execute('UPDATE users SET password = %s WHERE name = %s;',(password1a, usuario))
+                        conn.commit()
+                        cur.close()
+                        print('Modificacion realizada exitosamente!')
+                    except (Exception, psycopg2.DatabaseError) as error:
+                        print("Error en la transaccion, revirtiendo operaciones ", error)
+                        conn.rollback()
+            if b == 2:
+                usuario2 = input('Ingrese el usuario al que quiere mldificar el rol: ')
+                nrol = int(input('Ingrese el nuevo rol: '))
+                try:
+                    cur = conn.cursor()
+                    cur.execute('UPDATE users SET rol = %s WHERE name = %s;',(nrol, usuario2))
+                    conn.commit()
+                    cur.close()
+                    print('Modificacion realizada exitosamente!')
+                except (Exception, psycopg2.DatabaseError) as error:
+                    print("Error en la transaccion, revirtiendo operaciones ", error)
+                    conn.rollback()
+
+
         #Eliminar usuario
         if a == 3:
             usuario1 = input('Ingrese el usuario que desea eliminar: ')
@@ -152,6 +180,16 @@ def AdminUser():
             print("opcion")
         if a == 8:
             print("opcion")
+            
+        if a == 9:
+            perfilar()
+
+#Perfilar usuario en Mongo
+def perfilar():
+    usuario = input('Ingrese usuario que desea perfilar: ')
+    fecha = input('Ingrese fecha de perfilamiento: ')
+    
+
 
 #Log in y Register 
 
