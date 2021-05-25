@@ -1,8 +1,12 @@
 
 import psycopg2
 import psycopg2.extras
-#from pymongo import MongoClient
-#from pymongo import ASCENDING, DESCENDING
+from pymongo import MongoClient
+from pymongo import ASCENDING, DESCENDING
+import pandas as pd
+import numpy as np
+import datetime 
+import random 
 
 # Conectividad 
 
@@ -12,11 +16,10 @@ conn = psycopg2.connect (
         password="Krewella2001",
         host="localhost")
 
+client = MongoClient('localhost')
 
-#client = MongoClient('localhost')
-
-#db = client['']
-#col = db['']
+db = client['prueba']
+col = db['canciones']
 
 #Funciones 
 
@@ -24,7 +27,7 @@ def Login(username,password):
     cur = conn.cursor()
     cur.execute('select name from users where name = %s;', [username])
     userp = [i [0] for i in cur.fetchall()]
-    #print(userp)
+    print(userp)
     if userp == [username]:
         cur.execute('select password from users where password = %s;',[password])
         passp = [i [0] for i in cur.fetchall()]
@@ -123,6 +126,8 @@ def AdminUser():
                 except (Exception, psycopg2.DatabaseError) as error:
                     print("Error en la transaccion, revirtiendo operaciones ", error)
                     conn.rollback()
+        if a == 8:
+            generador()
 
 
         #Eliminar usuario
@@ -184,18 +189,71 @@ def AdminUser():
         if a == 9:
             perfilar()
 
+
+def generador():
+    songs = {
+        'Shape of you',
+        'Counting stars',
+        'Eraser',
+        'Dive',
+        'Perfect',
+        'Cielo en la tierra',
+        'Holy',
+        'Happier',
+        'Habitual',
+        'Forever'
+        }
+    
+    a = int(input("Ingrese la cantidad de tracks a generar: "))
+    rep = int(input("Ingrese la cantidad de reproducciones: "))
+    date = input("fecha: ")
+
+    for i in range (a):
+        song = random.choice(list(songs))
+        for j in range(rep):
+            cur = conn.cursor()
+            cur.execute("INSERT INTO repro(nombre, fecha) VALUES(%s,%s);",(song,date))
+            conn.commit()
+            cur.close()
+            
 #Perfilar usuario en Mongo
 def perfilar():
     usuario = input('Ingrese usuario que desea perfilar: ')
     fecha = input('Ingrese fecha de perfilamiento: ')
     
+    cur = conn.cursor()
+    cur.execute("select nombre from reproducciones Where usuario = %s and fecha = %s;",(usuario, fecha))
+    resultado = cur.fetchall()
+    #resultado = [i [] for i in cur.fetchall()]
+    #resultado2 = [i [1] for i in cur.fetchall()]
+    print(resultado)
+    cur.execute("select genero, count(genero) as total from reproducciones Where usuario = %s and fecha = %s group by genero;",(usuario, fecha))
+    resultado2 = cur.fetchall()
+    print(resultado2)
+    conn.commit()
+    cur.close()
+    
+    new = {
+        "user":usuario,
+        "fecha":fecha,
+        "canciones":resultado,
+        "generos":resultado2}
+    col.insert_one(new)
 
+"""    
+def recomendaciones():
+    fecha = input('Ingrese fecha para sacar recomendaciones: ')
+    cur = conn.cursor()
+    cur.execute() 
+"""
 
 #Log in y Register 
 
 print('Bienvenido')
 print('1. Log In\n' + '2. Register')
 opcion1 = int(input('Ingrese el numero de su eleccion: '))
+
+
 
 if opcion1 == 1:
     username = input("Ingrese ususario: ")
@@ -206,3 +264,6 @@ if opcion1 == 2:
     SignUp()
     
     
+
+
+
