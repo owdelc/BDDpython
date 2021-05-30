@@ -4,7 +4,7 @@ import psycopg2.extras
 from pymongo import MongoClient
 from pymongo import ASCENDING, DESCENDING
 import pandas as pd
-import numpy as np
+import numpy as np, numpy.random
 import datetime 
 import random 
 
@@ -191,18 +191,27 @@ def AdminUser():
 
 
 def generador():
-    songs = {
-        'Shape of you',
-        'Counting stars',
-        'Eraser',
-        'Dive',
-        'Perfect',
-        'Cielo en la tierra',
-        'Holy',
-        'Happier',
-        'Habitual',
-        'Forever'
+    songs = { 
+        'cancion1':{'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'album':{'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'artista': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'Eraser': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'Dive': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'Perfect': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'Cielo en la tierra': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'Holy': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'Happier': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'Habitual': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
+        'Forever': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'}
         }
+    
+    usuarios = {
+        'oscar',
+        'hugo',
+        'roberto',
+        'julio',
+        
+    }
     
     a = int(input("Ingrese la cantidad de tracks a generar: "))
     rep = int(input("Ingrese la cantidad de reproducciones: "))
@@ -212,7 +221,7 @@ def generador():
         song = random.choice(list(songs))
         for j in range(rep):
             cur = conn.cursor()
-            cur.execute("INSERT INTO repro(nombre, fecha) VALUES(%s,%s);",(song,date))
+            cur.execute("INSERT INTO repro(usuario,nombre, album, artista, fecha) VALUES(%s,%s,%s,%s,%s);",(song,date))
             conn.commit()
             cur.close()
             
@@ -251,6 +260,19 @@ def recomendaciones():
 
 print('Bienvenido')
 print('1. Log In\n' + '2. Register')
+
+############################
+numero = int(input("numero: "))
+canciones = int(input('canciones: '))
+rs = []
+for i in range(numero):
+    r = random.random()
+    numero = numero - r
+    rs.append(r)
+
+print(rs)
+############################
+
 opcion1 = int(input('Ingrese el numero de su eleccion: '))
 
 
@@ -264,6 +286,5 @@ if opcion1 == 2:
     SignUp()
     
     
-
 
 
