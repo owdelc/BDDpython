@@ -4,9 +4,10 @@ import psycopg2.extras
 from pymongo import MongoClient
 from pymongo import ASCENDING, DESCENDING
 import pandas as pd
-import numpy as np, numpy.random
 import datetime 
-import random 
+import random as ram
+import numpy as np
+from numpy.random import random
 
 # Conectividad 
 
@@ -191,26 +192,29 @@ def AdminUser():
             perfilar()
         
         if a == 10:
-            recomendaciones()
+            ""
         
             
 
 
 def generador():
-    songs = { 
-        'cancion1':{'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'album':{'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'artista': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'Eraser': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'Dive': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'Perfect': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'Cielo en la tierra': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'Holy': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'Happier': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'Habitual': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'},
-        'Forever': {'nombre':'Shape of you', 'album':'Counting star' , 'artista':'saijs'}
-        }
     
+    songs = [
+        'Shape of you',
+        'Counting star' , 
+        'Eraser',
+        'Dive',
+        'Perfect',
+        'Cielo en la tierra',
+        'Holy',
+        'Habitual',
+        'Forever'
+        ]
+    
+    album = {}
+
+    artista = {}
+        
     usuarios = {
         'oscar',
         'hugo',
@@ -219,15 +223,31 @@ def generador():
         
     }
     
-    a = int(input("Ingrese la cantidad de tracks a generar: "))
-    rep = int(input("Ingrese la cantidad de reproducciones: "))
-    date = input("fecha: ")
+    can = int(input("Ingrese la cantidad de tracks a generar: "))
+    repro = int(input("Ingrese la cantidad de reproducciones: "))
+    date = input("fecha: ")    
 
-    for i in range (a):
-        song = random.choice(list(songs))
-        for j in range(rep):
+    mean = repro/can
+    variance = int(.25*mean)
+    min = mean - variance
+    max = mean + variance
+    arr = [int(min)]*can
+
+    diff = repro - (min*can)    
+    while diff > 0:
+        ran = np.random.randint(0,can-1)
+        if arr[ran] >= max:
+            continue
+        arr[ran]+=1
+        diff-=1
+    print(arr)
+
+    for i in arr:
+        no = i
+        song = ram.choice(list(songs))
+        for j in range(no):
             cur = conn.cursor()
-            cur.execute("INSERT INTO repro(usuario,nombre, album, artista, fecha) VALUES(%s,%s,%s,%s,%s);",(song,date))
+            cur.execute("INSERT INTO repro(nombre,fecha) VALUES(%s,%s);",(song,date))
             conn.commit()
             cur.close()
             
@@ -286,27 +306,7 @@ def perfilar():
 
 
    
-def recomendaciones():
-    """
-    usuario = input('ingrese usuario: ')
-    fecha = input('ingrese fecha: ')
-    
-    pipeline = [{"$match":{"user":usuario, "fecha":fecha}},
-                {"$unwind": "$generos"},
-                {"$sort":{"generos":-1}},
-                {"$limit":1}]
-    resu = col.aggregate(pipeline)
-    gen = []
-    
-    for i in resu:
-        result = i["generos"]
-        gen.append(result[0])
 
-    print(gen)
-    """
-    cur = conn.cursor()
-    cur.execute("select usuario, genero, count(genero) from reproducciones group by usuario, genero order by count(genero) DESC")
-    print(cur.fetchall())
 
 
 #Log in y Register 
