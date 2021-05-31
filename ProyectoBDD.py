@@ -20,6 +20,7 @@ client = MongoClient('localhost')
 
 db = client['prueba']
 col = db['canciones']
+col2 = db['recomendaciones']
 
 #Funciones 
 
@@ -74,9 +75,9 @@ def SignUp():
 # Definicion de funcionalidades de Administrador 
 def AdminUser():
     a = 0
-    while a != 10:
+    while a != 11:
         print('\nIngrese la operacion que desea realizar')
-        print('1. Agregar un usuario \n' + '2. Actualizar usuario \n' + '3. Eliminar Usuario \n' + '4. Agregar Cancion \n' + '5. Modificar Cancion \n' + '6. Eliminar Cancion \n' +'7. Ver bitacora de acciones \n' + '8. Realizar simulacion de reproducciones \n' + '9. Perfilar usuario en MongoDB \n'+ '10. Salir')
+        print('1. Agregar un usuario \n' + '2. Actualizar usuario \n' + '3. Eliminar Usuario \n' + '4. Agregar Cancion \n' + '5. Modificar Cancion \n' + '6. Eliminar Cancion \n' +'7. Ver bitacora de acciones \n' + '8. Realizar simulacion de reproducciones \n' + '9. Perfilar usuario en MongoDB \n'+ '10. Recomendaciones' + '11. Salir')
         a = int(input('La operacion que desea realizar: '))
         
         #Agregar usuario
@@ -188,6 +189,11 @@ def AdminUser():
             
         if a == 9:
             perfilar()
+        
+        if a == 10:
+            recomendaciones()
+        
+            
 
 
 def generador():
@@ -227,40 +233,87 @@ def generador():
             
 #Perfilar usuario en Mongo
 def perfilar():
-    usuario = input('Ingrese usuario que desea perfilar: ')
+    
     fecha = input('Ingrese fecha de perfilamiento: ')
     
     cur = conn.cursor()
-    cur.execute("select nombre from reproducciones Where usuario = %s and fecha = %s;",(usuario, fecha))
+    cur.execute("select usuario from reproducciones  where fecha = %s group by usuario;", [fecha])
     resultado = cur.fetchall()
-    #resultado = [i [] for i in cur.fetchall()]
-    #resultado2 = [i [1] for i in cur.fetchall()]
-    print(resultado)
-    cur.execute("select genero, count(genero) as total from reproducciones Where usuario = %s and fecha = %s group by genero;",(usuario, fecha))
-    resultado2 = cur.fetchall()
-    print(resultado2)
+    tracks = []
+    reco = []
+    for element in resultado:
+        
+        user = element[0]        
+        
+        cur.execute("select usuario, genero, count(genero) as total from reproducciones Where usuario = %s and fecha = %s group by usuario,genero;",(user, fecha))
+        #resultado2 = cur.fetchall()
+        #print(resultado2)
+        resultado3 = cur.fetchall()
+        genres = []
+        for element2 in resultado3:
+            genre = element2[1]
+            total = element2[2]
+            genres.append({"genero":genre, "total":total})
+            
+            cur.execute("""select nombre, count(nombre) as total from reproducciones 
+                           where genero in (select genero from reproducciones
+                                                        where usuario = %s
+                                                        group by genero)
+                            group by nombre order by total DESC limit 10;""",[user])
+        resultado4 = [i [0] for i in cur.fetchall()]
+            #for element3 in resutado4:
+        reco.append({"usuario":user, "recomendaciones":resultado4})
+    
+                
+        
+        tracks.append({"usuario":user, "reproducciones_genero":genres})
+    
+    new = {"fecha" : fecha,
+           "registro":tracks}
+    col.insert_one(new)
+    
+    new2 = {"fecha" : fecha,
+            "registro" : reco}
+    col2.insert_one(new2)
+    
+    #print(reco)
+    #print(tracks)
+    
+    
     conn.commit()
     cur.close()
     
-    new = {
-        "user":usuario,
-        "fecha":fecha,
-        "canciones":resultado,
-        "generos":resultado2}
-    col.insert_one(new)
 
-"""    
+
+   
 def recomendaciones():
-    fecha = input('Ingrese fecha para sacar recomendaciones: ')
+    """
+    usuario = input('ingrese usuario: ')
+    fecha = input('ingrese fecha: ')
+    
+    pipeline = [{"$match":{"user":usuario, "fecha":fecha}},
+                {"$unwind": "$generos"},
+                {"$sort":{"generos":-1}},
+                {"$limit":1}]
+    resu = col.aggregate(pipeline)
+    gen = []
+    
+    for i in resu:
+        result = i["generos"]
+        gen.append(result[0])
+
+    print(gen)
+    """
     cur = conn.cursor()
-    cur.execute() 
-"""
+    cur.execute("select usuario, genero, count(genero) from reproducciones group by usuario, genero order by count(genero) DESC")
+    print(cur.fetchall())
+
 
 #Log in y Register 
 
 print('Bienvenido')
 print('1. Log In\n' + '2. Register')
-
+"""
 ############################
 numero = int(input("numero: "))
 canciones = int(input('canciones: '))
@@ -272,7 +325,7 @@ for i in range(numero):
 
 print(rs)
 ############################
-
+"""
 opcion1 = int(input('Ingrese el numero de su eleccion: '))
 
 
