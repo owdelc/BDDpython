@@ -76,9 +76,9 @@ def SignUp():
 # Definicion de funcionalidades de Administrador 
 def AdminUser():
     a = 0
-    while a != 11:
+    while a != 10:
         print('\nIngrese la operacion que desea realizar')
-        print('1. Agregar un usuario \n' + '2. Actualizar usuario \n' + '3. Eliminar Usuario \n' + '4. Agregar Cancion \n' + '5. Modificar Cancion \n' + '6. Eliminar Cancion \n' +'7. Ver bitacora de acciones \n' + '8. Realizar simulacion de reproducciones \n' + '9. Perfilar usuario en MongoDB \n'+ '10. Recomendaciones' + '11. Salir')
+        print('1. Agregar un usuario \n' + '2. Actualizar usuario \n' + '3. Eliminar Usuario \n' + '4. Agregar Cancion \n' + '5. Modificar Cancion \n' + '6. Eliminar Cancion \n' +'7. Ver bitacora de acciones \n' + '8. Realizar simulacion de reproducciones \n' + '9. Perfilar usuario en MongoDB \n'+ '10. Salir')
         a = int(input('La operacion que desea realizar: '))
         
         #Agregar usuario
@@ -200,33 +200,125 @@ def AdminUser():
 def generador():
     
     songs = [
-        'Shape of you',
-        'Counting star' , 
+        'fresh eyes',
+        'rylynn' , 
         'Eraser',
         'Dive',
-        'Perfect',
-        'Cielo en la tierra',
+        'samus',
+        'drifting',
         'Holy',
         'Habitual',
-        'Forever'
+        'Forever',
+        'take on me',
+        'illuminate',
+        'the sign',
+        'maxixe',
+        'madrigal',
+        'pepita',
+        'ste andina',
+        'orphaned land',
+        'tabula rasa',
+        'alone',
+        'here'
         ]
     
-    album = {}
-
-    artista = {}
+    albums = [
+        'clasicos',
+        'todo de ti',
+        'te necesito',
+        'el tren',
+        'inocentes',
+        'doctor',
+        'ella',
+        '42',
+        'feeling',
+        'presence',
+        'remedu',
+        'up all night',
+        'soul searching',
+        'busyhead',
+        'you',
+        'this city',
+        'the ultimate collection',
+        'where the shadow ends',
+        'la mas linda',
+        'mood'
         
+
+    ]
+
+    artistas = [
+        'khea',
+        'ricky',
+        'andy',
+        'juice wrld',
+        'gorillaz',
+        'yuuri',
+        'wos',
+        'halsey',
+        'maluma',
+        'clairo',
+        'dababy',
+        'radwimps',
+        'masn',
+        'zaz',
+        'mecano',
+        'tueno',
+        'dorian',
+        'jonah',
+        'aczino',
+        'chuty'
+    ]
+
+    geneross = [
+        'pop',
+        'country',
+        'rock',
+        'funk',
+        'edm',
+        'balada',
+        'punk',
+        'indie',
+        'steampunk',
+        'folk',
+        'lullabies',
+        'stories',
+        'ballet',
+        'alternative',
+        'classical',
+        'concerto',
+        'dubstep',
+        'dance',
+        'house'
+    ]
+
     usuarios = {
         'oscar',
         'hugo',
         'roberto',
         'julio',
-        
+        'agustina',
+        'alana',
+        'amanda',
+        'daniel',
+        'carlos',
+        'emilio',
+        'enrique',
+        'erik',
+        'ethan',
+        'felix',
+        'felipe',
+        'facundo',
+        'francisco',
+        'jorge',
+        'lorenzo',
+        'luis'      
     }
     
     can = int(input("Ingrese la cantidad de tracks a generar: "))
     repro = int(input("Ingrese la cantidad de reproducciones: "))
-    date = input("fecha: ")    
-
+    date = input("fecha: ")
+ 
     mean = repro/can
     variance = int(.25*mean)
     min = mean - variance
@@ -245,9 +337,14 @@ def generador():
     for i in arr:
         no = i
         song = ram.choice(list(songs))
+        album = ram.choice(list(albums))
+        artista = ram.choice(list(artistas))
+        genero = ram.choice(list(geneross))
         for j in range(no):
+            user = ram.choice(list(usuarios))
             cur = conn.cursor()
-            cur.execute("INSERT INTO repro(nombre,fecha) VALUES(%s,%s);",(song,date))
+            cur.execute("""INSERT INTO reproducciones(usuario,nombre,album,artista,genero,fecha) 
+                            VALUES(%s,%s,%s,%s,%s,%s);""",(user,song,album,artista,genero,date))
             conn.commit()
             cur.close()
             
@@ -313,19 +410,7 @@ def perfilar():
 
 print('Bienvenido')
 print('1. Log In\n' + '2. Register')
-"""
-############################
-numero = int(input("numero: "))
-canciones = int(input('canciones: '))
-rs = []
-for i in range(numero):
-    r = random.random()
-    numero = numero - r
-    rs.append(r)
 
-print(rs)
-############################
-"""
 opcion1 = int(input('Ingrese el numero de su eleccion: '))
 
 
